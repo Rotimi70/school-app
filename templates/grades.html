@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Grades{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Grades</h1><p>Enter scores out of 100 for a subject and term.</p></div>
+</div>
+
+{% if not classes %}
+<div class="card"><div class="empty">No classes are assigned to you yet. Ask an administrator.</div></div>
+{% else %}
+<div class="card">
+  <form class="toolbar" method="get">
+    <select name="class_id" aria-label="Class">
+      {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if c.id == class_id }}>{{ c.name }}</option>{% endfor %}
+    </select>
+    <input type="text" name="subject" class="fit" list="subjects" value="{{ subject }}" placeholder="Subject, e.g. Mathematics" aria-label="Subject" required>
+    <datalist id="subjects">{% for s in subjects %}<option value="{{ s }}">{% endfor %}</datalist>
+    <select name="term" aria-label="Term">
+      {% for t in terms %}<option {{ 'selected' if t == term }}>{{ t }}</option>{% endfor %}
+    </select>
+    <button class="btn secondary" type="submit">Load</button>
+  </form>
+
+  {% if subject and rows %}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="class_id" value="{{ class_id }}">
+    <input type="hidden" name="subject" value="{{ subject }}">
+    <input type="hidden" name="term" value="{{ term }}">
+    <p class="muted small" style="margin-bottom:10px">Editing <b>{{ subject }}</b> · {{ term }}. Leave a box empty to clear that score.</p>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>Student</th><th>Matric no.</th><th>Score (0–100)</th></tr></thead>
+      <tbody>
+      {% for s in rows %}
+      <tr>
+        <td><span class="name-cell"><span class="avatar">{{ s.name[:1]|upper }}</span>{{ s.name }}</span></td>
+        <td>{{ s.matric_no }}</td>
+        <td><input class="score-input" type="number" name="score_{{ s.id }}" min="0" max="100" step="0.5" value="{{ '%g'|format(s.score) if s.score is not none else '' }}" aria-label="Score for {{ s.name }}"></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    <div class="sticky-save"><button class="btn" type="submit">Save scores</button></div>
+  </form>
+  {% elif not subject %}
+  <div class="empty">Choose a subject and term, then press Load.</div>
+  {% else %}
+  <div class="empty">This class has no students yet.</div>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

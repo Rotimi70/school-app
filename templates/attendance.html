@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Attendance</h1><p>Mark who was in class on a given day.</p></div>
+</div>
+
+{% if not classes %}
+<div class="card"><div class="empty">No classes are assigned to you yet. Ask an administrator.</div></div>
+{% else %}
+<div class="card">
+  <form class="toolbar" method="get">
+    <select name="class_id" aria-label="Class">
+      {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if c.id == class_id }}>{{ c.name }}</option>{% endfor %}
+    </select>
+    <input type="date" name="date" value="{{ day }}" max="{{ today }}" aria-label="Date">
+    <button class="btn secondary" type="submit">Load</button>
+  </form>
+
+  {% if rows %}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="class_id" value="{{ class_id }}">
+    <input type="hidden" name="date" value="{{ day }}">
+    <div class="toolbar">
+      <button type="button" class="btn secondary sm" data-mark-all="present">Mark all present</button>
+      <button type="button" class="btn secondary sm" data-mark-all="absent">Mark all absent</button>
+    </div>
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>Student</th><th>Matric no.</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for s in rows %}
+      <tr>
+        <td><span class="name-cell"><span class="avatar">{{ s.name[:1]|upper }}</span>{{ s.name }}</span></td>
+        <td>{{ s.matric_no }}</td>
+        <td>
+          <div class="seg">
+            {% for val, cls, lab in [('present','p','Present'),('late','l','Late'),('absent','a','Absent')] %}
+            <input type="radio" name="status_{{ s.id }}" id="s{{ s.id }}{{ val }}" value="{{ val }}" {{ 'checked' if (s.status or 'present') == val }}>
+            <label class="{{ cls }}" for="s{{ s.id }}{{ val }}">{{ lab }}</label>
+            {% endfor %}
+          </div>
+          {% if not s.status %}<span class="badge gray" style="margin-left:8px">Not saved yet</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    <div class="sticky-save"><button class="btn" type="submit">Save attendance</button></div>
+  </form>
+  {% else %}<div class="empty">This class has no students yet.</div>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

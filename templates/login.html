@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <section class="login-art">
+    <div class="brand"><span class="logo">SM</span><span>School Manager</span></div>
+    <div>
+      <h2>Run your school day from one place.</h2>
+      <p>Students, attendance and grades, with the right access for every staff member.</p>
+    </div>
+    <ul>
+      <li>Admins manage teachers, classes and students</li>
+      <li>Teachers work only with their own classes</li>
+      <li>Attendance and grades in a couple of clicks</li>
+    </ul>
+  </section>
+  <section class="login-form">
+    <div class="login-card">
+      <h1>Welcome back</h1>
+      <p class="muted" style="margin-bottom:22px">Sign in to continue.</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+      {% endwith %}
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field">
+          <label class="lbl" for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="username" required autofocus>
+        </div>
+        <div class="field">
+          <label class="lbl" for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn" type="submit">Sign in</button>
+      </form>
+      {% if config.DEMO_MODE %}
+      <div class="demo-box">
+        <b>Demo accounts</b><br>
+        Admin: <code>admin@school.test</code> / <code>admin123</code><br>
+        Teacher: <code>teacher1@school.test</code> / <code>teacher123</code>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

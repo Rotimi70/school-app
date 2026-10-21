@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit teacher' if tid else 'Add teacher' }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ 'Edit teacher' if tid else 'Add teacher' }}</h1></div></div>
+<div class="card form-card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label class="lbl" for="name">Full name</label>
+      <input type="text" id="name" name="name" value="{{ form.name }}" required autofocus>
+    </div>
+    <div class="field">
+      <label class="lbl" for="email">Email (used to sign in)</label>
+      <input type="email" id="email" name="email" value="{{ form.email }}" required>
+    </div>
+    <div class="field">
+      <label class="lbl" for="password">{{ 'New password' if tid else 'Password' }}</label>
+      <input type="password" id="password" name="password" autocomplete="new-password" {{ '' if tid else 'required' }} minlength="{{ 0 if tid else 8 }}">
+      <p class="hint">{% if tid %}Leave blank to keep the current password. Otherwise at least 8 characters.{% else %}At least 8 characters. Share it with the teacher securely.{% endif %}</p>
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ 'Save changes' if tid else 'Create teacher' }}</button>
+      <a class="btn secondary" href="{{ url_for('teachers') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

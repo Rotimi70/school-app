@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit student' if sid else 'Add student' }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{ 'Edit student' if sid else 'Add student' }}</h1></div>
+</div>
+<div class="card form-card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label class="lbl" for="name">Full name</label>
+      <input type="text" id="name" name="name" value="{{ form.name }}" required autofocus>
+    </div>
+    <div class="field">
+      <label class="lbl" for="matric_no">Matric number</label>
+      <input type="text" id="matric_no" name="matric_no" value="{{ form.matric_no }}" placeholder="SCH/2026/025" required>
+    </div>
+    <div class="field">
+      <label class="lbl" for="email">Email <span class="muted">(optional)</span></label>
+      <input type="email" id="email" name="email" value="{{ form.email or '' }}">
+    </div>
+    <div class="field">
+      <label class="lbl" for="class_id">Class</label>
+      <select id="class_id" name="class_id">
+        {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if c.id == form.class_id }}>{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ 'Save changes' if sid else 'Add student' }}</button>
+      <a class="btn secondary" href="{{ url_for('students') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
