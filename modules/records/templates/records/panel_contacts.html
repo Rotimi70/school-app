@@ -1,0 +1,31 @@
+<div class="card panel">
+  <div class="card-head">
+    <h2>Family contacts</h2>
+    <a class="btn secondary sm" href="{{ url_for('records.contact_form', sid=student.id) }}">{{ icon('plus') }}Add contact</a>
+  </div>
+  {% if contacts %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Email</th><th></th></tr></thead>
+    <tbody>
+    {% for c in contacts %}
+    <tr>
+      <td><b>{{ c.full_name }}</b>
+        {% if c.is_primary %}<span class="badge green">Primary</span>{% endif %}
+        {% if c.is_emergency %}<span class="badge red">Emergency</span>{% endif %}
+        {% if c.address %}<div class="muted small">{{ c.address }}</div>{% endif %}</td>
+      <td>{{ c.relationship }}</td>
+      <td>{{ c.phone or '—' }}</td>
+      <td class="muted">{{ c.email or '—' }}</td>
+      <td class="actions">
+        <a class="btn secondary sm" href="{{ url_for('records.contact_form', sid=student.id, cid=c.id) }}">Edit</a>
+        <form class="inline" method="post" action="{{ url_for('records.contact_delete', sid=student.id, cid=c.id) }}" data-confirm="Remove {{ c.full_name }} from this student's contacts?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn danger sm" type="submit">Remove</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<div class="empty">No family contacts yet. Add a parent or guardian so the school can reach the family.</div>{% endif %}
+</div>

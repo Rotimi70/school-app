@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Teachers{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Teachers</h1><p>Create teacher accounts and reset their passwords.</p></div>
+  <a class="btn" href="{{ url_for('administration.teacher_form') }}">{{ icon('plus') }}Add teacher</a>
+</div>
+<div class="card">
+  {% if teachers %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Name</th><th>Email</th><th>Classes</th><th></th></tr></thead>
+    <tbody>
+    {% for t in teachers %}
+    <tr>
+      <td><span class="name-cell"><span class="avatar">{{ t.name[:1]|upper }}</span>{{ t.name }}</span></td>
+      <td>{{ t.email }}</td>
+      <td>{% if t.class_names %}{{ t.class_names }}{% else %}<span class="muted">None assigned</span>{% endif %}</td>
+      <td class="actions">
+        <a class="btn secondary sm" href="{{ url_for('administration.teacher_form', tid=t.id) }}">Edit</a>
+        <form class="inline" method="post" action="{{ url_for('administration.teacher_delete', tid=t.id) }}" data-confirm="Delete {{ t.name }}? Their classes will become unassigned.">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn danger sm" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<div class="empty">No teachers yet.</div>{% endif %}
+</div>
+{% endblock %}

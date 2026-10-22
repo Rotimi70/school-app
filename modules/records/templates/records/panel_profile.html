@@ -1,0 +1,20 @@
+<div class="card panel">
+  <div class="card-head">
+    <h2>Personal details</h2>
+    <a class="btn secondary sm" href="{{ url_for('records.profile_edit', sid=student.id) }}">{{ 'Edit' if profile else 'Add details' }}</a>
+  </div>
+  <dl class="kv kv-wide">
+    <dt>Matric no.</dt><dd>{{ student.matric_no }}</dd>
+    {% if profile %}
+    <dt>National ID</dt><dd>{{ profile.national_id or '—' }}</dd>
+    <dt>Date of birth</dt><dd>{{ profile.date_of_birth or '—' }}{% if age is not none %} ({{ age }} years){% endif %}</dd>
+    <dt>Gender</dt><dd>{{ (profile.gender or '—')|capitalize }}</dd>
+    <dt>Nationality</dt><dd>{{ profile.nationality or '—' }}</dd>
+    <dt>State of origin</dt><dd>{{ profile.state_of_origin or '—' }}</dd>
+    <dt>Home address</dt><dd>{{ profile.home_address or '—' }}</dd>
+    <dt>Phone</dt><dd>{{ profile.phone or '—' }}</dd>
+    <dt>Admission date</dt><dd>{{ profile.admission_date or '—' }}</dd>
+    {% endif %}
+  </dl>
+  {% if not profile %}<p class="muted small" style="margin-top:12px">No personal details recorded yet.</p>{% endif %}
+</div>

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Admissions{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Admissions</h1><p>{{ total }} application{{ '' if total == 1 else 's' }} on record.</p></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a class="btn secondary" href="{{ url_for('admissions.applications_export', status=status, q=q) }}">Export CSV</a>
+    <a class="btn" href="{{ url_for('admissions.application_new') }}">{{ icon('plus') }}New application</a>
+  </div>
+</div>
+
+<div class="tabs">
+  <a class="tab {{ 'active' if not status }}" href="{{ url_for('admissions.applications', q=q) }}">All<b>{{ total }}</b></a>
+  {% for s in statuses %}
+  <a class="tab {{ 'active' if status == s }}" href="{{ url_for('admissions.applications', status=s, q=q) }}">{{ STATUS_LABELS[s] }}<b>{{ counts.get(s, 0) }}</b></a>
+  {% endfor %}
+</div>
+
+<div class="card">
+  <form class="toolbar" method="get">
+    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+    <div class="search">{{ icon('search') }}<input type="text" name="q" value="{{ q }}" placeholder="Search by name, application number, phone or email"></div>
+    <button class="btn secondary" type="submit">Search</button>
+    {% if q %}<a class="btn secondary" href="{{ url_for('admissions.applications', status=status) }}">Clear</a>{% endif %}
+  </form>
+
+  {% if rows %}
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Application no.</th><th>Applicant</th><th>Class</th><th>Year</th><th>Status</th><th>Applied</th><th></th></tr></thead>
+    <tbody>
+    {% for a in rows %}
+    <tr>
+      <td><a href="{{ url_for('admissions.application_detail', aid=a.id) }}"><b>{{ a.application_no }}</b></a></td>
+      <td>{{ a.first_name }} {{ a.last_name }}</td>
+      <td>{{ a.class_name or '—' }}</td>
+      <td>{{ a.academic_year }}</td>
+      <td><span class="badge {{ STATUS_BADGE[a.status] }}">{{ STATUS_LABELS[a.status] }}</span></td>
+      <td class="muted">{{ a.applied_on }}</td>
+      <td class="actions"><a class="btn secondary sm" href="{{ url_for('admissions.application_detail', aid=a.id) }}">Open</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<div class="empty">No applications found.</div>{% endif %}
+</div>
+{% endblock %}

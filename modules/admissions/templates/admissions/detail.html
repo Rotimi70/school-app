@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}{{ a.application_no }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <a class="small" href="{{ url_for('admissions.applications') }}">← All applications</a>
+    <h1 style="margin-top:6px">{{ a.first_name }} {{ a.last_name }}</h1>
+    <p>{{ a.application_no }} · {{ a.academic_year }} · <span class="badge {{ STATUS_BADGE[a.status] }}">{{ STATUS_LABELS[a.status] }}</span></p>
+  </div>
+  {% if a.status != 'enrolled' %}
+  <div class="action-row">
+    <a class="btn secondary" href="{{ url_for('admissions.application_edit', aid=a.id) }}">Edit</a>
+    <form class="inline" method="post" action="{{ url_for('admissions.application_delete', aid=a.id) }}" data-confirm="Delete this application? This can't be undone.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn danger" type="submit">Delete</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="card-head"><h2>Applicant</h2></div>
+    <dl class="kv kv-wide">
+      <dt>Class applied for</dt><dd>{{ a.class_name or 'Not decided' }}</dd>
+      <dt>Date of birth</dt><dd>{{ a.date_of_birth or '—' }}</dd>
+      <dt>Gender</dt><dd>{{ (a.gender or '—')|capitalize }}</dd>
+      <dt>Nationality</dt><dd>{{ a.nationality or '—' }}</dd>
+      <dt>State of origin</dt><dd>{{ a.state_of_origin or '—' }}</dd>
+      <dt>Home address</dt><dd>{{ a.home_address or '—' }}</dd>
+      <dt>Phone</dt><dd>{{ a.phone or '—' }}</dd>
+      <dt>Email</dt><dd>{{ a.email or '—' }}</dd>
+      <dt>Previous school</dt><dd>{{ a.previous_school or '—' }}</dd>
+      <dt>National ID</dt><dd>{{ a.national_id or '—' }}</dd>
+      <dt>Applied on</dt><dd>{{ a.applied_on }}</dd>
+      <dt>Decision date</dt><dd>{{ a.decided_on or '—' }}</dd>
+      {% if a.notes %}<dt>Notes</dt><dd>{{ a.notes }}</dd>{% endif %}
+    </dl>
+  </div>
+
+  <div style="display:grid;gap:16px;align-content:start">
+    <div class="card">
+      <div class="card-head"><h2>Progress</h2></div>
+      {% if a.status == 'enrolled' %}
+        <p>Enrolled on <b>{{ a.enrolled_on }}</b>.</p>
+        {% if student_url %}<p style="margin-top:10px"><a class="btn" href="{{ student_url }}">Open student record</a></p>{% endif %}
+      {% else %}
+        {% if next_statuses %}
+        <div class="action-row">
+          {% for s in next_statuses %}
+          <form class="inline" method="post" action="{{ url_for('admissions.application_status', aid=a.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="{{ s }}">
+            <button class="btn {{ ACTION_STYLE.get(s, 'secondary') }}" type="submit">{{ ACTION_LABELS[s] }}</button>
+          </form>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if a.status == 'accepted' %}
+        <form method="post" action="{{ url_for('admissions.application_enrol', aid=a.id) }}" style="margin-top:16px"
+              data-confirm="Enrol {{ a.first_name }} {{ a.last_name }} as a student? A matric number will be generated.">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="field">
+            <label class="lbl" for="enrol-class">Enrol into class</label>
+            <select id="enrol-class" name="class_id">
+              {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if c.id == a.class_id }}>{{ c.name }}</option>{% endfor %}
+            </select>
+            <p class="hint">Creates the student record with a new matric number and copies the details and guardians across.</p>
+          </div>
+          <button class="btn" type="submit">{{ icon('user-plus') }}Enrol student</button>
+        </form>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Parents and guardians</h2></div>
+      {% if guardians %}
+      <div class="table-wrap"><table class="table" style="min-width:0">
+        <tbody>
+        {% for gd in guardians %}
+        <tr>
+          <td><b>{{ gd.full_name }}</b>
+            {% if gd.is_primary %}<span class="badge green">Primary</span>{% endif %}
+            <div class="muted small">{{ gd.relationship }}{% if gd.phone %} · {{ gd.phone }}{% endif %}{% if gd.email %} · {{ gd.email }}{% endif %}</div></td>
+          <td class="actions">
+            {% if a.status != 'enrolled' %}
+            <form class="inline" method="post" action="{{ url_for('admissions.guardian_delete', aid=a.id, gid=gd.id) }}" data-confirm="Remove {{ gd.full_name }}?">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn danger sm" type="submit">Remove</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table></div>
+      {% else %}<div class="empty">No guardian recorded yet.</div>{% endif %}
+
+      {% if a.status != 'enrolled' %}
+      <form method="post" action="{{ url_for('admissions.guardian_add', aid=a.id) }}" style="margin-top:14px">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="section-title">Add a guardian</div>
+        <div class="form-grid">
+          <div class="field"><label class="lbl" for="g-name">Full name</label><input type="text" id="g-name" name="name" required></div>
+          <div class="field"><label class="lbl" for="g-rel">Relationship</label>
+            <select id="g-rel" name="relationship">{% for r in RELATIONSHIPS %}<option>{{ r }}</option>{% endfor %}</select></div>
+          <div class="field"><label class="lbl" for="g-phone">Phone</label><input type="text" id="g-phone" name="phone"></div>
+          <div class="field"><label class="lbl" for="g-email">Email</label><input type="email" id="g-email" name="email"></div>
+        </div>
+        <label class="chk"><input type="checkbox" name="is_emergency"> Emergency contact</label>
+        <div class="form-actions"><button class="btn secondary" type="submit">Add guardian</button></div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

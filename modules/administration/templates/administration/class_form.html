@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit class' if cid else 'Add class' }}{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>{{ 'Edit class' if cid else 'Add class' }}</h1></div></div>
+<div class="card form-card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label class="lbl" for="name">Class name</label>
+      <input type="text" id="name" name="name" value="{{ form.name }}" placeholder="e.g. JSS 3B" required autofocus>
+    </div>
+    <div class="field">
+      <label class="lbl" for="teacher_id">Teacher</label>
+      <select id="teacher_id" name="teacher_id">
+        <option value="">Unassigned</option>
+        {% for t in teachers %}<option value="{{ t.id }}" {{ 'selected' if t.id == form.teacher_id }}>{{ t.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ 'Save changes' if cid else 'Create class' }}</button>
+      <a class="btn secondary" href="{{ url_for('administration.classes') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

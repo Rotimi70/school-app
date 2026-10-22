@@ -1,0 +1,13 @@
+<div class="card panel">
+  <div class="card-head">
+    <h2>Admission record</h2>
+    <a class="btn secondary sm" href="{{ url_for('admissions.application_detail', aid=row.id) }}">Open application</a>
+  </div>
+  <dl class="kv kv-wide">
+    <dt>Application no.</dt><dd>{{ row.application_no }}</dd>
+    <dt>Academic year</dt><dd>{{ row.academic_year }}</dd>
+    <dt>Applied on</dt><dd>{{ row.applied_on }}</dd>
+    <dt>Enrolled on</dt><dd>{{ row.enrolled_on or '—' }}</dd>
+    {% if row.previous_school %}<dt>Previous school</dt><dd>{{ row.previous_school }}</dd>{% endif %}
+  </dl>
+</div>

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit contact' if cid else 'Add contact' }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><a class="small" href="{{ url_for('students.student_detail', sid=student.id) }}">← {{ student.name }}</a>
+    <h1 style="margin-top:6px">{{ 'Edit family contact' if cid else 'Add family contact' }}</h1></div>
+</div>
+<div class="card form-card wide">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="field">
+        <label class="lbl" for="full_name">Full name</label>
+        <input type="text" id="full_name" name="full_name" value="{{ form.full_name or '' }}" required autofocus>
+      </div>
+      <div class="field">
+        <label class="lbl" for="relationship">Relationship</label>
+        <select id="relationship" name="relationship">
+          {% for r in RELATIONSHIPS %}<option {{ 'selected' if form.relationship == r }}>{{ r }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" value="{{ form.phone or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ form.email or '' }}">
+      </div>
+      <div class="field full">
+        <label class="lbl" for="address">Address <span class="muted">(optional)</span></label>
+        <input type="text" id="address" name="address" value="{{ form.address or '' }}">
+      </div>
+      <div class="field full">
+        <label class="chk"><input type="checkbox" name="is_primary" {{ 'checked' if form.is_primary }}> Primary contact</label>
+        <label class="chk"><input type="checkbox" name="is_emergency" {{ 'checked' if form.is_emergency }}> Emergency contact</label>
+        <p class="hint">Give at least a phone number or an email.</p>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">Save contact</button>
+      <a class="btn secondary" href="{{ url_for('students.student_detail', sid=student.id) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

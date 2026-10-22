@@ -24,8 +24,8 @@
       <form method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="field">
-          <label class="lbl" for="email">Email</label>
-          <input type="email" id="email" name="email" autocomplete="username" required autofocus>
+          <label class="lbl" for="email">Email or matric number</label>
+          <input type="text" id="email" name="email" autocomplete="username" required autofocus>
         </div>
         <div class="field">
           <label class="lbl" for="password">Password</label>
@@ -37,7 +37,8 @@
       <div class="demo-box">
         <b>Demo accounts</b><br>
         Admin: <code>admin@school.test</code> / <code>admin123</code><br>
-        Teacher: <code>teacher1@school.test</code> / <code>teacher123</code>
+        Teacher: <code>teacher1@school.test</code> / <code>teacher123</code><br>
+        Student: <code>SCH/2026/001</code> / <code>student123</code>
       </div>
       {% endif %}
     </div>

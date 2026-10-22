@@ -1,5 +1,6 @@
 PRAGMA foreign_keys = ON;
 
+-- Core tables used by every module.
 CREATE TABLE IF NOT EXISTS users (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     name          TEXT NOT NULL,
@@ -24,23 +25,4 @@ CREATE TABLE IF NOT EXISTS students (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
-CREATE TABLE IF NOT EXISTS attendance (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-    date       TEXT NOT NULL,
-    status     TEXT NOT NULL CHECK (status IN ('present', 'absent', 'late')),
-    UNIQUE (student_id, date)
-);
-
-CREATE TABLE IF NOT EXISTS grades (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    student_id INTEGER NOT NULL REFERENCES students(id) ON DELETE CASCADE,
-    subject    TEXT NOT NULL,
-    term       TEXT NOT NULL,
-    score      REAL NOT NULL CHECK (score >= 0 AND score <= 100),
-    UNIQUE (student_id, subject, term)
-);
-
 CREATE INDEX IF NOT EXISTS idx_students_class ON students(class_id);
-CREATE INDEX IF NOT EXISTS idx_attendance_date ON attendance(date);
-CREATE INDEX IF NOT EXISTS idx_grades_student ON grades(student_id);

@@ -1,93 +1,46 @@
-# School Manager
+# School Manager (v3, modular)
 
-Flask + SQLite school management app: login, Admin/Teacher roles, student CRUD with search, attendance, grades and a dashboard. Runs on free hosting with no paid services.
+A small school management web app: Flask + SQLite, no paid services.
 
-## Run it locally
+## Modules
+Each module lives in `modules/<name>/` with its own routes, templates, database tables (`schema.sql`) and optional demo data. The shared **core** (`core/`) only handles login, security, the database connection and navigation.
 
-```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+| Module | What it does |
+|---|---|
+| dashboard | Overview cards |
+| students | Student list, search, CSV export, student logins, `/me` portal |
+| attendance | Daily attendance + export |
+| grades | Scores per subject/term + export |
+| timetable | Weekly class schedule, with clash detection |
+| records | Personal details, national ID, family contacts, register export |
+| admissions | Applications -> review -> offer -> accept -> enrol (creates the student and a matric number) |
+| administration | Teachers and classes |
+
+### If one module breaks
+- A module that fails to load is skipped; the rest of the app keeps running and admins see a banner.
+- A crash inside one module shows a friendly "this part is unavailable" page.
+- Sections on the student page (personal details, contacts, admission record) fail on their own.
+- Admins can open **System status** (`/system`) to see what is loaded.
+- Switch modules off with an environment variable, e.g. `DISABLED_MODULES=timetable,admissions`.
+
+Honest limit: all modules share one SQLite file and the core, so a broken core or a corrupt database still affects everything. Truly separate services would need separate hosting.
+
+## Run locally
+```
 pip install -r requirements.txt
 python app.py
 ```
+Demo logins (demo mode only): admin@school.test / admin123, teacher1@school.test / teacher123, student SCH/2026/001 / student123.
 
-Open http://127.0.0.1:5000. The first start creates `school.db` with demo data.
+## Settings (environment variables)
+`SECRET_KEY`, `DEMO_MODE` (1/0), `DATABASE`, `SCHOOL_CODE` (matric prefix, default SCH), `DISABLED_MODULES`.
 
-| Role    | Email                  | Password   |
-|---------|------------------------|------------|
-| Admin   | admin@school.test      | admin123   |
-| Teacher | teacher1@school.test   | teacher123 |
-| Teacher | teacher2@school.test   | teacher123 |
+## Upgrading from v2
+1. Copy the v3 files over your project. **Delete the old `schema.sql` in the project root** (each module now has its own).
+2. `git add .`, `git commit -m "v3 modules"`, `git push`.
+3. On the server: `git pull`, then Reload the web app.
 
-Teachers only see the classes assigned to them. Admins see everything and manage teachers and classes.
+New tables are created automatically; existing data is kept.
 
-## Project structure
-
-```
-school-app/
-├── app.py            routes, auth, roles, CSRF, queries, seed data
-├── schema.sql        users, classes, students, attendance, grades
-├── requirements.txt
-├── templates/        Jinja pages
-└── static/           style.css, app.js
-```
-
-## Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "School Manager"
-git branch -M main
-git remote add origin https://github.com/<your-username>/school-app.git
-git push -u origin main
-```
-
-`.gitignore` keeps `school.db` and secrets out of the repo.
-
-## Deploy free on PythonAnywhere
-
-Free-tier limits change, so check their current terms.
-
-1. Sign up at pythonanywhere.com and open a **Bash console**.
-2. `git clone https://github.com/<your-username>/school-app.git`
-3. `cd school-app && pip install --user -r requirements.txt`
-4. **Web** tab → **Add a new web app** → **Flask** → point it at `~/school-app/app.py`. If it asks for a Python version, pick the same one you installed with.
-5. In the **WSGI configuration file**, make sure it imports the app, e.g. `from app import app as application`, and that the project folder is on `sys.path`.
-6. Still in the Web tab, add environment variables in the WSGI file **above** the import:
-   ```python
-   import os
-   os.environ["SECRET_KEY"] = "paste-a-long-random-string"
-   os.environ["DEMO_MODE"] = "0"
-   ```
-   Generate a key with `python -c "import secrets; print(secrets.token_hex(32))"`.
-7. Press **Reload**. Your link is `https://<username>.pythonanywhere.com`.
-
-## Before you share the public link
-
-- Sign in as admin and **change the demo passwords** (Teachers page for teachers; for the admin, see below).
-- Set `DEMO_MODE=0` so the demo credentials box is hidden on the login page.
-- Set a real `SECRET_KEY`.
-
-Change the admin password from a Python shell in the project folder:
-
-```bash
-python -c "
-import sqlite3
-from werkzeug.security import generate_password_hash
-db = sqlite3.connect('school.db')
-db.execute(\"UPDATE users SET password_hash=? WHERE email='admin@school.test'\", (generate_password_hash('YourNewStrongPassword'),))
-db.commit()
-"
-```
-
-## Known limits
-
-- SQLite suits a demo or a small school, not heavy traffic.
-- No email password reset: an admin resets teacher passwords.
-- No login rate limiting yet.
-
-## Next up
-
-- Student logins (read-only view of their own attendance and grades)
-- CSV export for students, attendance and grades
+## Adding a module
+Create `modules/<name>/` with `__init__.py` exposing a `MODULE` dict, then add the name to `MODULE_NAMES` in `modules/__init__.py`.

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+{% set attendance_url = safe_url('attendance.attendance') %}
+<div class="page-head">
+  <div>
+    <h1>Hello, {{ g.user.name.split()[0] }}</h1>
+    <p>{% if g.user.role == 'admin' %}Here's how the whole school is doing.{% else %}Here's how your classes are doing.{% endif %}</p>
+  </div>
+  {% if attendance_url %}<a class="btn" href="{{ attendance_url }}">{{ icon('check') }}Take attendance</a>{% endif %}
+</div>
+
+<div class="grid-stats">
+  <div class="card stat"><div class="bubble b-indigo">{{ icon('users') }}</div>
+    <div><b>{{ stats.students }}</b><span>Students</span></div></div>
+  <div class="card stat"><div class="bubble b-green">{{ icon('percent') }}</div>
+    <div><b>{{ '%.0f%%'|format(stats.att_rate) if stats.att_rate is not none else '–' }}</b><span>Attendance, last 30 days</span></div></div>
+  <div class="card stat"><div class="bubble b-amber">{{ icon('award') }}</div>
+    <div><b>{{ stats.avg_grade if stats.avg_grade is not none else '–' }}</b><span>Average grade</span></div></div>
+  {% if g.user.role == 'admin' %}
+  <div class="card stat"><div class="bubble b-sky">{{ icon('briefcase') }}</div>
+    <div><b>{{ stats.teachers }}</b><span>Teachers · {{ stats.classes }} classes</span></div></div>
+  {% else %}
+  <div class="card stat"><div class="bubble b-sky">{{ icon('layers') }}</div>
+    <div><b>{{ stats.classes }}</b><span>Your classes</span></div></div>
+  {% endif %}
+  {% for c in extra_cards %}
+  <div class="card stat"><div class="bubble b-{{ c.tone or 'indigo' }}">{{ icon(c.icon) }}</div>
+    <div><b>{{ c.value }}</b><span>{{ c.label }}</span></div></div>
+  {% endfor %}
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="card-head"><h2>Attendance, recent school days</h2></div>
+    {% if trend %}
+    <div class="bars">
+      {% for t in trend %}
+      <div class="bar"><b>{{ t.rate }}%</b><div class="track"><div class="fill" style="height:{{ t.rate }}%"></div></div><span>{{ t.label }}</span></div>
+      {% endfor %}
+    </div>
+    {% else %}<div class="empty">No attendance recorded yet.</div>{% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Classes</h2></div>
+    {% if per_class %}
+    <div class="table-wrap"><table class="table">
+      <thead><tr><th>Class</th>{% if g.user.role == 'admin' %}<th>Teacher</th>{% endif %}<th>Students</th><th>Attendance</th><th>Avg grade</th></tr></thead>
+      <tbody>
+      {% for c in per_class %}
+      <tr>
+        <td><b>{{ c.name }}</b></td>
+        {% if g.user.role == 'admin' %}<td>{{ c.teacher or '—' }}</td>{% endif %}
+        <td>{{ c.n_students }}</td>
+        <td>{% if c.att_rate is not none %}{{ c.att_rate }}%{% else %}–{% endif %}</td>
+        <td>{{ c.avg_grade if c.avg_grade is not none else '–' }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    {% else %}<div class="empty">No classes are assigned to you yet.</div>{% endif %}
+  </div>
+</div>
+{% endblock %}

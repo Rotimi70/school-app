@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit application' if aid else 'New application' }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    {% if aid %}<a class="small" href="{{ url_for('admissions.application_detail', aid=aid) }}">← {{ application.application_no }}</a>
+    {% else %}<a class="small" href="{{ url_for('admissions.applications') }}">← All applications</a>{% endif %}
+    <h1 style="margin-top:6px">{{ 'Edit application' if aid else 'New application' }}</h1>
+  </div>
+</div>
+<div class="card form-card wide">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="section-title">Applicant</div>
+    <div class="form-grid">
+      <div class="field">
+        <label class="lbl" for="first_name">First name</label>
+        <input type="text" id="first_name" name="first_name" value="{{ form.first_name or '' }}" required autofocus>
+      </div>
+      <div class="field">
+        <label class="lbl" for="last_name">Last name</label>
+        <input type="text" id="last_name" name="last_name" value="{{ form.last_name or '' }}" required>
+      </div>
+      <div class="field">
+        <label class="lbl" for="date_of_birth">Date of birth</label>
+        <input type="date" id="date_of_birth" name="date_of_birth" value="{{ form.date_of_birth or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="gender">Gender</label>
+        <select id="gender" name="gender">
+          <option value="">Not stated</option>
+          {% for g_ in GENDERS %}<option value="{{ g_ }}" {{ 'selected' if form.gender == g_ }}>{{ g_|capitalize }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="nationality">Nationality</label>
+        <input type="text" id="nationality" name="nationality" value="{{ form.nationality or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="state_of_origin">State of origin</label>
+        <input type="text" id="state_of_origin" name="state_of_origin" value="{{ form.state_of_origin or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" value="{{ form.phone or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ form.email or '' }}">
+      </div>
+      <div class="field full">
+        <label class="lbl" for="home_address">Home address</label>
+        <input type="text" id="home_address" name="home_address" value="{{ form.home_address or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="previous_school">Previous school</label>
+        <input type="text" id="previous_school" name="previous_school" value="{{ form.previous_school or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="national_id">National ID / birth certificate no. <span class="muted">(optional)</span></label>
+        <input type="text" id="national_id" name="national_id" value="{{ form.national_id or '' }}">
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:10px">Admission</div>
+    <div class="form-grid">
+      <div class="field">
+        <label class="lbl" for="class_id">Class applied for</label>
+        <select id="class_id" name="class_id">
+          <option value="">Not decided</option>
+          {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if form.class_id == c.id }}>{{ c.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="academic_year">Academic year</label>
+        <input type="text" id="academic_year" name="academic_year" value="{{ form.academic_year or '' }}" placeholder="2026/2027" required>
+      </div>
+      <div class="field full">
+        <label class="lbl" for="notes">Notes <span class="muted">(optional)</span></label>
+        <textarea id="notes" name="notes">{{ form.notes or '' }}</textarea>
+      </div>
+    </div>
+
+    {% if not aid %}
+    <div class="section-title" style="margin-top:10px">Parent or guardian <span class="muted" style="text-transform:none;letter-spacing:0">(optional, you can add more later)</span></div>
+    <div class="form-grid">
+      <div class="field">
+        <label class="lbl" for="guardian_name">Full name</label>
+        <input type="text" id="guardian_name" name="guardian_name" value="{{ form.guardian_full_name or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="guardian_relationship">Relationship</label>
+        <select id="guardian_relationship" name="guardian_relationship">
+          {% for r in RELATIONSHIPS %}<option {{ 'selected' if form.guardian_relationship == r }}>{{ r }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="guardian_phone">Phone</label>
+        <input type="text" id="guardian_phone" name="guardian_phone" value="{{ form.guardian_phone or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="guardian_email">Email</label>
+        <input type="email" id="guardian_email" name="guardian_email" value="{{ form.guardian_email or '' }}">
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ 'Save changes' if aid else 'Record application' }}</button>
+      <a class="btn secondary" href="{{ url_for('admissions.application_detail', aid=aid) if aid else url_for('admissions.applications') }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

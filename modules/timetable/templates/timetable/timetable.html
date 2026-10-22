@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Timetable{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Timetable</h1><p>Weekly lessons, Monday to Friday.</p></div>
+  {% if g.user.role == 'admin' %}
+  <a class="btn" href="{{ url_for('timetable.slot_form', class_id=class_id) }}">{{ icon('plus') }}Add lesson</a>
+  {% endif %}
+</div>
+
+{% if not classes %}
+<div class="card"><div class="empty">No class timetable is available to you yet.</div></div>
+{% else %}
+<div class="card">
+  {% if classes|length > 1 %}
+  <form class="toolbar" method="get">
+    <select name="class_id" aria-label="Class" onchange="this.form.submit()">
+      {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if c.id == class_id }}>{{ c.name }}</option>{% endfor %}
+    </select>
+    <noscript><button class="btn secondary" type="submit">Show</button></noscript>
+  </form>
+  {% else %}
+  <p class="muted" style="margin-bottom:12px">Class: <b>{{ classes[0].name }}</b></p>
+  {% endif %}
+
+  {% if grid %}
+  <div class="table-wrap"><table class="tt">
+    <thead><tr><th></th>{% for d, name in DAYS.items() %}<th>{{ name }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for row in grid %}
+    <tr>
+      <td class="time">{{ row.start }}–{{ row.end }}</td>
+      {% for d in DAYS %}
+      <td>
+        {% for s in row.cells[d] %}
+        <div class="slot"><b>{{ s.subject }}</b>
+          <span>{{ s.teacher_name or 'No teacher set' }}{% if s.room %} · {{ s.room }}{% endif %}</span>
+          {% if g.user.role == 'admin' %}<div><a href="{{ url_for('timetable.slot_form', slot_id=s.id) }}">Edit</a></div>{% endif %}
+        </div>
+        {% endfor %}
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}<div class="empty">No lessons have been scheduled for this class yet.</div>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

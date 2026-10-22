@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit lesson' if slot_id else 'Add lesson' }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><a class="small" href="{{ url_for('timetable.timetable', class_id=form.class_id) }}">← Timetable</a>
+    <h1 style="margin-top:6px">{{ 'Edit lesson' if slot_id else 'Add lesson' }}</h1></div>
+</div>
+<div class="card form-card wide">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="field">
+        <label class="lbl" for="class_id">Class</label>
+        <select id="class_id" name="class_id">
+          {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if form.class_id == c.id }}>{{ c.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="weekday">Day</label>
+        <select id="weekday" name="weekday">
+          {% for d, name in DAYS.items() %}<option value="{{ d }}" {{ 'selected' if form.weekday == d }}>{{ name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="start_time">Starts</label>
+        <input type="time" id="start_time" name="start_time" value="{{ form.start_time or '' }}" required>
+      </div>
+      <div class="field">
+        <label class="lbl" for="end_time">Ends</label>
+        <input type="time" id="end_time" name="end_time" value="{{ form.end_time or '' }}" required>
+      </div>
+      <div class="field">
+        <label class="lbl" for="subject">Subject</label>
+        <input type="text" id="subject" name="subject" value="{{ form.subject or '' }}" required>
+      </div>
+      <div class="field">
+        <label class="lbl" for="teacher_id">Teacher</label>
+        <select id="teacher_id" name="teacher_id">
+          <option value="">Not set</option>
+          {% for t in teachers %}<option value="{{ t.id }}" {{ 'selected' if form.teacher_id == t.id }}>{{ t.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field full">
+        <label class="lbl" for="room">Room <span class="muted">(optional)</span></label>
+        <input type="text" id="room" name="room" value="{{ form.room or '' }}">
+        <p class="hint">Two lessons can't overlap for the same class, and a teacher can't be in two classes at once.</p>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ 'Save lesson' if slot_id else 'Add lesson' }}</button>
+      <a class="btn secondary" href="{{ url_for('timetable.timetable', class_id=form.class_id) }}">Cancel</a>
+      {% if slot_id %}
+      <button class="btn danger" type="submit" form="delete-slot" style="margin-left:auto">Delete lesson</button>
+      {% endif %}
+    </div>
+  </form>
+  {% if slot_id %}
+  <form id="delete-slot" method="post" action="{{ url_for('timetable.slot_delete', slot_id=slot_id) }}" data-confirm="Delete this lesson?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

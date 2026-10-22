@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Personal details{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><a class="small" href="{{ url_for('students.student_detail', sid=student.id) }}">← {{ student.name }}</a>
+    <h1 style="margin-top:6px">Personal details</h1></div>
+</div>
+<div class="card form-card wide">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="field">
+        <label class="lbl" for="date_of_birth">Date of birth</label>
+        <input type="date" id="date_of_birth" name="date_of_birth" value="{{ form.date_of_birth or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="gender">Gender</label>
+        <select id="gender" name="gender">
+          <option value="">Not stated</option>
+          {% for g_ in GENDERS %}<option value="{{ g_ }}" {{ 'selected' if form.gender == g_ }}>{{ g_|capitalize }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="nationality">Nationality</label>
+        <input type="text" id="nationality" name="nationality" value="{{ form.nationality or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="state_of_origin">State of origin</label>
+        <input type="text" id="state_of_origin" name="state_of_origin" value="{{ form.state_of_origin or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="phone">Phone</label>
+        <input type="text" id="phone" name="phone" value="{{ form.phone or '' }}">
+      </div>
+      <div class="field">
+        <label class="lbl" for="admission_date">Admission date</label>
+        <input type="date" id="admission_date" name="admission_date" value="{{ form.admission_date or '' }}">
+      </div>
+      <div class="field full">
+        <label class="lbl" for="home_address">Home address</label>
+        <input type="text" id="home_address" name="home_address" value="{{ form.home_address or '' }}">
+      </div>
+      <div class="field full">
+        <label class="lbl" for="national_id">National ID / birth certificate no. <span class="muted">(optional)</span></label>
+        <input type="text" id="national_id" name="national_id" value="{{ form.national_id or '' }}">
+        <p class="hint">Only record this if the school needs it. Each number can belong to one student only.</p>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn" type="submit">Save details</button>
+      <a class="btn secondary" href="{{ url_for('students.student_detail', sid=student.id) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -7,27 +7,23 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-{% set ep = request.endpoint or '' %}
 {% if g.user %}
 <div class="shell">
   <div class="scrim" id="scrim"></div>
   <aside class="sidebar" id="sidebar">
     <div class="brand"><span class="logo">SM</span><span>School Manager</span></div>
     <nav>
-      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if ep == 'dashboard' }}">{{ icon('home') }}Dashboard</a>
-      <a href="{{ url_for('students') }}" class="{{ 'active' if ep.startswith('student') }}">{{ icon('users') }}Students</a>
-      <a href="{{ url_for('attendance') }}" class="{{ 'active' if ep == 'attendance' }}">{{ icon('check') }}Attendance</a>
-      <a href="{{ url_for('grades') }}" class="{{ 'active' if ep == 'grades' }}">{{ icon('award') }}Grades</a>
-      {% if g.user.role == 'admin' %}
-      <div class="nav-label">Administration</div>
-      <a href="{{ url_for('teachers') }}" class="{{ 'active' if ep.startswith('teacher') }}">{{ icon('briefcase') }}Teachers</a>
-      <a href="{{ url_for('classes') }}" class="{{ 'active' if ep.startswith('class') }}">{{ icon('layers') }}Classes</a>
-      {% endif %}
+      {% for group, items in nav_groups %}
+        {% if group != 'main' %}<div class="nav-label">{{ group }}</div>{% endif %}
+        {% for item in items %}
+        <a href="{{ url_for(item.endpoint) }}" class="{{ 'active' if nav_active(item) }}">{{ icon(item.icon) }}{{ item.label }}</a>
+        {% endfor %}
+      {% endfor %}
     </nav>
     <div class="me">
       <div class="avatar">{{ g.user.name[:1]|upper }}</div>
       <div class="me-info"><b>{{ g.user.name }}</b><span>{{ g.user.role }}</span></div>
-      <form method="post" action="{{ url_for('logout') }}" class="inline">
+      <form method="post" action="{{ url_for('core.logout') }}" class="inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button class="icon-btn" title="Log out" aria-label="Log out">{{ icon('logout') }}</button>
       </form>
@@ -39,6 +35,11 @@
       <span>School Manager</span>
     </div>
     <main class="main">
+      {% if failed_modules and g.user.role == 'admin' %}
+      <div class="flash error">{{ failed_modules|length }} section{{ 's are' if failed_modules|length != 1 else ' is' }} unavailable
+        ({% for m in failed_modules %}{{ m.label }}{{ ', ' if not loop.last }}{% endfor %}).
+        The rest of the system is working. <a href="{{ url_for('core.system_status') }}">See system status</a></div>
+      {% endif %}
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for cat, msg in messages %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
       {% endwith %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Hello, {{ student.name.split()[0] }}</h1><p>Your attendance and grades at a glance.</p></div>
+</div>
+
+<div class="grid-stats">
+  <div class="card stat"><div class="bubble b-green">{{ icon('percent') }}</div>
+    <div><b>{{ '%.0f%%'|format(rate) if rate is not none else '–' }}</b><span>Attendance</span></div></div>
+  <div class="card stat"><div class="bubble b-amber">{{ icon('award') }}</div>
+    <div><b>{{ avg if avg is not none else '–' }}</b><span>Average grade</span></div></div>
+  <div class="card stat"><div class="bubble b-indigo">{{ icon('layers') }}</div>
+    <div><b>{{ student.class_name }}</b><span>Your class</span></div></div>
+</div>
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="profile-head">
+      <div class="avatar">{{ student.name[:1]|upper }}</div>
+      <div><h1 style="font-size:20px">{{ student.name }}</h1><span class="badge indigo">{{ student.class_name }}</span></div>
+    </div>
+    <dl class="kv">
+      <dt>Matric no.</dt><dd>{{ student.matric_no }}</dd>
+      <dt>Email</dt><dd>{{ student.email or '—' }}</dd>
+      <dt>Present</dt><dd>{{ counts.get('present', 0) }} days</dd>
+      <dt>Late</dt><dd>{{ counts.get('late', 0) }} days</dd>
+      <dt>Absent</dt><dd>{{ counts.get('absent', 0) }} days</dd>
+    </dl>
+  </div>
+
+  <div style="display:grid;gap:16px;align-content:start">
+    <div class="card">
+      <div class="card-head"><h2>My grades</h2></div>
+      {% if grades %}
+      <div class="table-wrap"><table class="table" style="min-width:0">
+        <thead><tr><th>Subject</th><th>Term</th><th>Score</th></tr></thead>
+        <tbody>{% for g_ in grades %}
+          <tr><td>{{ g_.subject }}</td><td>{{ g_.term }}</td>
+          <td><span class="badge {{ 'green' if g_.score >= 70 else ('amber' if g_.score >= 50 else 'red') }}">{{ '%g'|format(g_.score) }}</span></td></tr>
+        {% endfor %}</tbody>
+      </table></div>
+      {% else %}<div class="empty">No grades recorded yet.</div>{% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Recent attendance</h2></div>
+      {% if recent %}
+      <div class="table-wrap"><table class="table" style="min-width:0">
+        <tbody>{% for r in recent %}
+          <tr><td>{{ r.date }}</td>
+          <td><span class="badge {{ {'present':'green','late':'amber','absent':'red'}[r.status] }}">{{ r.status|capitalize }}</span></td></tr>
+        {% endfor %}</tbody>
+      </table></div>
+      {% else %}<div class="empty">No attendance recorded yet.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}System status{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>System status</h1><p>Each section runs on its own. If one fails to start, the others keep working.</p></div>
+</div>
+<div class="card">
+  <div class="table-wrap"><table class="table">
+    <thead><tr><th>Section</th><th>Status</th><th>Details</th></tr></thead>
+    <tbody>
+    {% for m in modules %}
+    <tr>
+      <td><b>{{ m.label }}</b><div class="muted small">{{ m.name }}</div></td>
+      <td>
+        {% if m.disabled %}<span class="badge gray">Switched off</span>
+        {% elif m.ok %}<span class="badge green">Running</span>
+        {% else %}<span class="badge red">Not loaded</span>{% endif %}
+      </td>
+      <td class="muted small">{% if m.error %}<code>{{ m.error }}</code>{% elif m.disabled %}Disabled with DISABLED_MODULES.{% else %}—{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <p class="muted small" style="margin-top:14px">Details of a failure are in the server error log. To switch a section off, set <code>DISABLED_MODULES</code> (for example <code>timetable,admissions</code>) and reload.</p>
+</div>
+{% endblock %}
