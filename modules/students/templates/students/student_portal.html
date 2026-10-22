@@ -3,6 +3,7 @@
 {% block content %}
 <div class="page-head">
   <div><h1>Hello, {{ student.name.split()[0] }}</h1><p>Your attendance and grades at a glance.</p></div>
+  <a class="btn secondary" href="{{ url_for('students.my_password') }}">Change password</a>
 </div>
 
 <div class="grid-stats">
@@ -42,6 +43,8 @@
       </table></div>
       {% else %}<div class="empty">No grades recorded yet.</div>{% endif %}
     </div>
+
+    {% for p in panels %}{{ p }}{% endfor %}
 
     <div class="card">
       <div class="card-head"><h2>Recent attendance</h2></div>

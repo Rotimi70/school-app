@@ -198,3 +198,17 @@ textarea:focus{outline:2px solid #c7d2fe;border-color:var(--primary)}
 .tt .slot span{color:var(--muted);font-size:12px}
 .tt .slot a{font-size:12px}
 @media (max-width:700px){.form-grid{grid-template-columns:1fr}}
+
+/* grade comparison chart */
+.gc{display:grid;gap:14px}
+.gc-row{display:grid;grid-template-columns:110px 1fr 52px;gap:12px;align-items:center}
+.gc-label{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis}
+.gc-bars{display:grid;gap:4px}
+.gc-bar{height:20px;border-radius:6px;min-width:34px;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-size:12px;font-weight:600;color:#fff}
+.gc-bar.me,.gc-legend i.me{background:var(--primary)}
+.gc-bar.avg,.gc-legend i.avg{background:#94a3b8}
+.gc-diff{font-size:13px;font-weight:700;text-align:right}
+.gc-diff.up{color:var(--green)}.gc-diff.down{color:var(--red)}
+.gc-legend{display:flex;gap:18px;margin-top:14px;font-size:13px;color:var(--muted)}
+.gc-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+@media(max-width:520px){.gc-row{grid-template-columns:1fr 48px}.gc-label{grid-column:1/-1}}

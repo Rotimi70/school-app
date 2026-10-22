@@ -1,0 +1,19 @@
+<div class="card panel">
+  <div class="card-head"><h2>Grades compared with class average</h2>
+    <span class="muted small">All terms combined</span></div>
+  {% if bars %}
+  <div class="gc" role="img" aria-label="Bar chart of each subject score compared with the class average">
+    {% for b in bars %}
+    <div class="gc-row">
+      <div class="gc-label">{{ b.subject }}</div>
+      <div class="gc-bars">
+        <div class="gc-bar me" style="width:{{ b.mine }}%"><span>{{ '%g'|format(b.mine) }}</span></div>
+        <div class="gc-bar avg" style="width:{{ b.avg }}%"><span>{{ '%g'|format(b.avg) }}</span></div>
+      </div>
+      <div class="gc-diff {{ 'up' if b.mine >= b.avg else 'down' }}">{{ '%+.1f'|format(b.mine - b.avg) }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="gc-legend"><span><i class="me"></i>This student</span><span><i class="avg"></i>Class average</span></div>
+  {% else %}<div class="empty">No grades recorded yet, so there is nothing to compare.</div>{% endif %}
+</div>

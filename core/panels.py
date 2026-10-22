@@ -8,9 +8,12 @@ from flask import current_app, render_template
 from markupsafe import Markup
 
 
-def render_student_panels(student):
+def render_student_panels(student, portal=False):
+    """portal=True: only the sections marked safe for the student's own page."""
     out = []
     for panel in current_app.config.get("STUDENT_PANELS", []):
+        if portal and not getattr(panel, "portal", False):
+            continue
         try:
             html = panel(student)
         except Exception:

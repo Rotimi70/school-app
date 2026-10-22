@@ -1,7 +1,7 @@
 import sqlite3
 
 from flask import (Blueprint, current_app, flash, g, redirect, render_template, request, url_for)
-from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from core.csvutil import csv_response
 from core.db import execute, placeholders, query
@@ -95,7 +95,33 @@ def me():
     student = query(
         "SELECT s.*, c.name AS class_name FROM students s "
         "JOIN classes c ON c.id = s.class_id WHERE s.id=?", (g.user["student_id"],), one=True)
-    return render_template("students/student_portal.html", student=student, **student_summary(student["id"]))
+    return render_template("students/student_portal.html", student=student,
+                           panels=render_student_panels(student, portal=True), **student_summary(student["id"]))
+
+
+@bp.route("/me/password", methods=["GET", "POST"])
+@student_required
+def my_password():
+    """A student changes their own password (must know the current one)."""
+    if request.method == "POST":
+        row = query("SELECT password_hash FROM student_accounts WHERE student_id=?",
+                    (g.user["student_id"],), one=True)
+        current = request.form.get("current", "")
+        new = request.form.get("new", "")
+        if row is None or not check_password_hash(row["password_hash"], current):
+            flash("Your current password is not correct.", "error")
+        elif len(new) < 8:
+            flash("The new password must be at least 8 characters.", "error")
+        elif new != request.form.get("confirm", ""):
+            flash("The two new passwords don't match.", "error")
+        elif new == current:
+            flash("Choose a password different from the current one.", "error")
+        else:
+            execute("UPDATE student_accounts SET password_hash=? WHERE student_id=?",
+                    (generate_password_hash(new), g.user["student_id"]))
+            flash("Password changed.", "success")
+            return redirect(url_for("students.me"))
+    return render_template("students/password.html")
 
 
 @bp.route("/students/<int:sid>/account", methods=["POST"])
