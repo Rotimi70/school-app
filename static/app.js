@@ -11,6 +11,17 @@
   if (toggle) toggle.addEventListener("click", function () { setNav(!sidebar.classList.contains("open")); });
   if (scrim) scrim.addEventListener("click", function () { setNav(false); });
 
+  // Login: show/hide password, and focus the first field on larger screens only
+  var pw = document.getElementById("password"), pwBtn = document.getElementById("pw-toggle");
+  if (pw && pwBtn) pwBtn.addEventListener("click", function () {
+    var show = pw.type === "password";
+    pw.type = show ? "text" : "password";
+    pwBtn.textContent = show ? "Hide" : "Show";
+    pwBtn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+  });
+  var first = document.getElementById("email");
+  if (first && window.innerWidth > 860) first.focus();
+
   // Confirm before destructive actions: <form data-confirm="Are you sure?">
   document.querySelectorAll("form[data-confirm]").forEach(function (form) {
     form.addEventListener("submit", function (e) {

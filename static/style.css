@@ -156,7 +156,7 @@ main.plain{min-height:100vh}
 .error-page h1{font-size:72px;color:var(--primary)}
 
 /* ---------- Responsive ---------- */
-@media (max-width:980px){.two-col,.detail-grid{grid-template-columns:1fr}}
+@media (max-width:980px){.two-col,.detail-grid{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:860px){
   .shell{display:block}
   .sidebar{position:fixed;left:0;top:0;bottom:0;width:264px;transform:translateX(-100%);transition:transform .2s;z-index:40}
@@ -166,8 +166,6 @@ main.plain{min-height:100vh}
     position:sticky;top:0;z-index:20;font-weight:700}
   .topbar-mobile button{background:none;border:0;cursor:pointer;color:var(--text);padding:4px;display:grid}
   .main{padding:20px 16px 40px}
-  .login-wrap{grid-template-columns:1fr}
-  .login-art{display:none}
   .kv{grid-template-columns:90px 1fr}
 }
 
@@ -212,3 +210,76 @@ textarea:focus{outline:2px solid #c7d2fe;border-color:var(--primary)}
 .gc-legend{display:flex;gap:18px;margin-top:14px;font-size:13px;color:var(--muted)}
 .gc-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 @media(max-width:520px){.gc-row{grid-template-columns:1fr 48px}.gc-label{grid-column:1/-1}}
+
+/* ---------- Login: password toggle ---------- */
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:64px}
+.pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--primary);
+  font-weight:600;font-size:13px;padding:8px 10px;cursor:pointer;border-radius:8px}
+.pw-toggle:hover{background:var(--primary-soft)}
+
+/* ---------- Phones ---------- */
+@media (max-width:860px){
+  .login-wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr;background:#f4f6fb}
+  .login-art{padding:36px 24px 72px;gap:0;justify-content:flex-start;text-align:center;align-items:center}
+  .login-art .brand{font-size:20px}
+  .login-pitch{margin-top:18px}
+  .login-art h2{font-size:24px;margin:0 auto}
+  .login-art p{font-size:14px;margin:10px auto 0}
+  .login-art ul{display:none}
+  .login-form{background:none;padding:0 16px 32px;align-items:start}
+  .login-card{background:#fff;border:1px solid var(--border);border-radius:20px;box-shadow:0 10px 30px rgba(15,23,42,.12);
+    padding:26px 22px;margin-top:-48px}
+  .login-card h1{font-size:22px}
+  input,select,textarea{font-size:16px}          /* stops iPhones zooming in on focus */
+  .login-card input{padding:13px 14px}
+  .login-card .btn{padding:14px;font-size:16px}
+  .grid-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .grid-stats .card{padding:14px}
+  .stat{flex-direction:column;align-items:flex-start;gap:10px}
+  .stat b{font-size:22px}
+  .stat span{font-size:12px}
+  .page-head{flex-wrap:wrap;gap:12px}
+  h1{font-size:22px}
+}
+@media (max-width:860px){.grid-stats .card:last-child:nth-child(odd){grid-column:1/-1}}
+
+/* ---------- Polish ---------- */
+.search input[type=text]{padding-left:40px}            /* keeps the text clear of the magnifier */
+.btn{transition:transform .08s ease,box-shadow .15s ease,background .15s ease}
+.btn:active{transform:scale(.97)}
+.btn:not(.secondary):not(.danger):hover{box-shadow:0 6px 16px rgba(79,70,229,.28)}
+.card{transition:box-shadow .2s ease,transform .2s ease}
+.grid-stats .card:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(15,23,42,.10)}
+.sidebar nav a{transition:background .15s ease,color .15s ease}
+.sidebar nav a.active{box-shadow:0 6px 16px rgba(79,70,229,.35)}
+.table tbody tr{transition:background .12s ease}
+a:focus-visible,button:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:8px}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.main > *{animation:rise .35s ease both}
+.main > *:nth-child(2){animation-delay:.05s}.main > *:nth-child(3){animation-delay:.1s}
+.main > *:nth-child(n+4){animation-delay:.15s}
+@media (prefers-reduced-motion:reduce){.main > *{animation:none}.btn,.card{transition:none}}
+
+@media (max-width:860px){
+  .hide-col2 th:nth-child(2),.hide-col2 td:nth-child(2){display:none}   /* matric no. is secondary on a phone */
+  .seg label{padding:8px 11px}
+  .table-wrap{margin:0 -8px}
+  .toolbar{gap:8px}
+  .toolbar .btn,.toolbar select{flex:1 1 auto}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;margin-right:-16px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{white-space:nowrap}
+  .topbar-mobile{box-shadow:0 1px 8px rgba(15,23,42,.06)}
+}
+@media (max-width:860px){
+  .hide-col2 .avatar{display:none}
+  .hide-col2 td,.hide-col2 th{padding-left:8px;padding-right:8px}
+  .hide-col2 .seg label{padding:8px 9px;font-size:12px}
+  .hide-col2 .badge{display:block;margin:4px 0 0!important;width:max-content}
+}
+@media (max-width:860px){
+  .hide-col2{min-width:0!important;width:100%}
+  .hide-col2 .seg{display:flex;width:100%}
+  .hide-col2 .seg label{flex:1;text-align:center}
+}

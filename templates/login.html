@@ -4,7 +4,7 @@
 <div class="login-wrap">
   <section class="login-art">
     <div class="brand"><span class="logo">SM</span><span>School Manager</span></div>
-    <div>
+    <div class="login-pitch">
       <h2>Run your school day from one place.</h2>
       <p>Students, attendance and grades, with the right access for every staff member.</p>
     </div>
@@ -25,11 +25,14 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="field">
           <label class="lbl" for="email">Email or matric number</label>
-          <input type="text" id="email" name="email" autocomplete="username" required autofocus>
+          <input type="text" id="email" name="email" autocomplete="username" required autocapitalize="none" autocorrect="off" spellcheck="false">
         </div>
         <div class="field">
           <label class="lbl" for="password">Password</label>
-          <input type="password" id="password" name="password" autocomplete="current-password" required>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
+            <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Show password">Show</button>
+          </div>
         </div>
         <button class="btn" type="submit">Sign in</button>
       </form>
